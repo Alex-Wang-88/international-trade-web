@@ -1,0 +1,95 @@
+@import '@payloadcms/ui/scss';
+
+.dashboard .before-dashboard {
+  display: grid;
+  gap: base(1);
+  margin-bottom: base(2);
+  padding: base(1.25);
+  border: 1px solid var(--theme-elevation-150);
+  border-radius: 12px;
+  background: var(--theme-elevation-50);
+
+  h3,
+  h4,
+  p {
+    margin: 0;
+  }
+
+  &__entries {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: base(.75);
+
+    a {
+      display: grid;
+      gap: base(.3);
+      padding: base(.9);
+      border: 1px solid var(--theme-elevation-150);
+      border-radius: 9px;
+      background: var(--theme-elevation-0);
+      color: inherit;
+      text-decoration: none;
+
+      &:hover,
+      &:focus-visible {
+        border-color: var(--theme-elevation-500);
+      }
+
+      span {
+        color: var(--theme-elevation-650);
+        line-height: 1.5;
+      }
+    }
+  }
+
+  &__stats {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: base(.5);
+
+    div {
+      display: grid;
+      gap: 2px;
+      padding: base(.65);
+      border-radius: 8px;
+      background: var(--theme-elevation-100);
+
+      strong {
+        font-size: 1.5rem;
+      }
+
+      &.is-warning {
+        color: var(--theme-error-500);
+      }
+    }
+  }
+
+  &__columns {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: base(1);
+
+    section {
+      padding: base(.8);
+      border: 1px solid var(--theme-elevation-150);
+      border-radius: 8px;
+    }
+
+    ul {
+      margin: base(.5) 0 0;
+      padding-inline-start: base(1);
+    }
+  }
+
+  &__footer a {
+    font-weight: 600;
+  }
+
+  @include mid-break {
+    &__entries,
+    &__stats,
+    &__columns {
+      grid-template-columns: 1fr;
+    }
+  }
+}
