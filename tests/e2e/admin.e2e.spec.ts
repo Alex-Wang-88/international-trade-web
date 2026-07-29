@@ -13,14 +13,15 @@ test.describe('merchant admin', () => {
   })
 
   test('shows the four primary merchant tasks', async ({ page }) => {
-    await expect(page.getByRole('navigation', { name: '后台主要功能' })).toBeVisible()
+    const primaryTasks = page.getByRole('navigation', { name: '后台主要功能' })
+    await expect(primaryTasks).toBeVisible()
     for (const label of [
       '商品管理',
       '首页商品排序',
       '博客管理',
       '公司资料与联系方式',
     ]) {
-      await expect(page.getByRole('link', { name: new RegExp(label) })).toBeVisible()
+      await expect(primaryTasks.getByRole('link', { name: new RegExp(label) })).toBeVisible()
     }
   })
 
