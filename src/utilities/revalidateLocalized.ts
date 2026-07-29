@@ -1,5 +1,5 @@
 import type { PayloadRequest } from 'payload'
-import { revalidatePath, revalidateTag } from 'next/cache'
+import { revalidatePath, revalidateTag } from 'next/cache.js'
 
 import { getRequestLocale, TRANSLATION_CONTEXT_KEY } from '@/i18n/translationWorkflow'
 import { isSiteLocale, locales, type SiteLocale } from '@/i18n/config'
