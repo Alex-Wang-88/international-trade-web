@@ -163,6 +163,12 @@ export const enum_company_translation_status_mode = pgEnum('enum_company_transla
   'auto',
   'manual',
 ])
+export const enum_customer_service_auth_scheme = pgEnum('enum_customer_service_auth_scheme', [
+  'bearer',
+  'raw',
+  'x-api-key',
+  'none',
+])
 
 export const products_specifications = pgTable(
   'products_specifications',
@@ -1371,6 +1377,16 @@ export const company_locales = pgTable(
   ],
 )
 
+export const customer_service = pgTable('customer_service', {
+  id: serial('id').primaryKey(),
+  enabled: boolean('enabled').default(true),
+  apiUrl: varchar('api_url'),
+  apiKey: varchar('api_key'),
+  authScheme: enum_customer_service_auth_scheme('auth_scheme').notNull().default('bearer'),
+  updatedAt: timestamp('updated_at', { mode: 'string', withTimezone: true, precision: 3 }),
+  createdAt: timestamp('created_at', { mode: 'string', withTimezone: true, precision: 3 }),
+})
+
 export const homepage = pgTable('homepage', {
   id: serial('id').primaryKey(),
   updatedAt: timestamp('updated_at', { mode: 'string', withTimezone: true, precision: 3 }),
@@ -1884,6 +1900,7 @@ export const relations_company = relations(company, ({ many }) => ({
     relationName: '_locales',
   }),
 }))
+export const relations_customer_service = relations(customer_service, () => ({}))
 export const relations_homepage_rels = relations(homepage_rels, ({ one }) => ({
   parent: one(homepage, {
     fields: [homepage_rels.parent],
@@ -1932,6 +1949,7 @@ type DatabaseSchema = {
   enum_company_translation_status_locale: typeof enum_company_translation_status_locale
   enum_company_translation_status_status: typeof enum_company_translation_status_status
   enum_company_translation_status_mode: typeof enum_company_translation_status_mode
+  enum_customer_service_auth_scheme: typeof enum_customer_service_auth_scheme
   products_specifications: typeof products_specifications
   products_specifications_locales: typeof products_specifications_locales
   products_translation_status: typeof products_translation_status
@@ -1976,6 +1994,7 @@ type DatabaseSchema = {
   company_translation_status: typeof company_translation_status
   company: typeof company
   company_locales: typeof company_locales
+  customer_service: typeof customer_service
   homepage: typeof homepage
   homepage_rels: typeof homepage_rels
   relations_products_specifications_locales: typeof relations_products_specifications_locales
@@ -2022,6 +2041,7 @@ type DatabaseSchema = {
   relations_company_translation_status: typeof relations_company_translation_status
   relations_company_locales: typeof relations_company_locales
   relations_company: typeof relations_company
+  relations_customer_service: typeof relations_customer_service
   relations_homepage_rels: typeof relations_homepage_rels
   relations_homepage: typeof relations_homepage
 }

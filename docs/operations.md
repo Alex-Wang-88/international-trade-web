@@ -23,6 +23,12 @@ LibreTranslate, AI Chat and Blog Publish are independent optional integrations.
 If `BLOG_PUBLISH_TOKEN` is empty, its route responds with 404. Keep the previous
 token temporarily in `BLOG_PUBLISH_TOKEN_PREVIOUS` during rotation.
 
+AI customer-service settings are managed by an owner under `Admin > System
+settings > Customer service API`. The global stores the endpoint, API key and
+authentication scheme. Apply the database migration before opening this page
+in a deployment with `PAYLOAD_DB_PUSH=false`. The `AI_CHAT_*` environment
+variables remain a fallback for existing deployments and emergency recovery.
+
 ## Object storage
 
 Create a private bucket and expose only the intended public media prefix through

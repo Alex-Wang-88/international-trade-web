@@ -16,6 +16,7 @@ import { Users } from '@/collections/Users'
 import { env, isSMTPConfigured } from '@/config/env'
 import { defaultLexical } from '@/fields/defaultLexical'
 import { Company } from '@/globals/Company'
+import { CustomerService } from '@/globals/CustomerService'
 import { Homepage } from '@/globals/Homepage'
 import { translationTasks } from '@/jobs/translationTasks'
 import { plugins } from '@/plugins'
@@ -100,7 +101,7 @@ export default buildConfig({
   collections: [Products, Posts, Media, Categories, Users, AuditEvents],
   cors: [env.siteURL],
   csrf: [env.siteURL],
-  globals: [Company, Homepage],
+  globals: [Company, CustomerService, Homepage],
   graphQL: {
     disablePlaygroundInProduction: true,
   },

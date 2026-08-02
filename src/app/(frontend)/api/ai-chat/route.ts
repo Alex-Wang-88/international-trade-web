@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 
+import { agentAuthHeaders, parseAgentResponse } from '@/customerService/agent'
 import { getMessages, isSiteLocale, localeMeta } from '@/i18n/config'
 import { consumeRateLimit, trustedClientKey } from '@/utilities/rateLimit'
+import { getCustomerServiceConfig } from '@/utilities/getCustomerServiceConfig'
 
 const bodySchema = z.object({
   message: z.string().trim().min(1).max(1_200),
@@ -19,55 +21,6 @@ const bodySchema = z.object({
     .max(6)
     .optional(),
 }).strict()
-
-function findText(value: unknown): string {
-  if (typeof value === 'string') return value
-  if (Array.isArray(value)) return value.map(findText).filter(Boolean).join('')
-  if (!value || typeof value !== 'object') return ''
-  const record = value as Record<string, unknown>
-  for (const key of ['answer', 'content', 'text', 'output', 'result', 'message']) {
-    const found = findText(record[key])
-    if (found) return found
-  }
-  return ''
-}
-
-function parseAgentResponse(raw: string, contentType: string) {
-  if (contentType.includes('text/event-stream')) {
-    return raw
-      .split(/\r?\n/)
-      .filter((line) => line.startsWith('data:'))
-      .map((line) => line.slice(5).trim())
-      .filter((line) => line && line !== '[DONE]')
-      .map((line) => {
-        try {
-          return findText(JSON.parse(line))
-        } catch {
-          return line
-        }
-      })
-      .join('')
-  }
-  try {
-    return findText(JSON.parse(raw))
-  } catch {
-    return raw
-  }
-}
-
-function agentAuthHeaders(apiKey: string | undefined): Record<string, string> {
-  if (!apiKey) return {}
-  switch ((process.env.AI_CHAT_AUTH_SCHEME || 'bearer').toLowerCase()) {
-    case 'raw':
-      return { Authorization: apiKey }
-    case 'x-api-key':
-      return { 'X-API-Key': apiKey }
-    case 'none':
-      return {}
-    default:
-      return { Authorization: `Bearer ${apiKey}` }
-  }
-}
 
 export async function POST(request: NextRequest) {
   const contentLength = Number(request.headers.get('content-length') || 0)
@@ -108,9 +61,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: t.tooMany }, { status: 429 })
   }
 
-  const apiUrl = process.env.AI_CHAT_API_URL
-  const apiKey = process.env.AI_CHAT_API_KEY
-  if (!apiUrl) return NextResponse.json({ answer: t.aiConnecting })
+  const customerService = await getCustomerServiceConfig()
+  if (!customerService.enabled || !customerService.apiUrl) {
+    return NextResponse.json({ answer: t.aiConnecting })
+  }
 
   const context = {
     mode: 'customer_service',
@@ -127,11 +81,11 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const upstream = await fetch(apiUrl, {
+    const upstream = await fetch(customerService.apiUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        ...agentAuthHeaders(apiKey),
+        ...agentAuthHeaders(customerService.apiKey, customerService.authScheme),
       },
       body: JSON.stringify({
         messages: [{ role: 'user', content: JSON.stringify(context) }],

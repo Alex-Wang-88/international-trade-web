@@ -1,11 +1,13 @@
 // @vitest-environment node
 
+import { POST as aiChatPOST } from '@/app/(frontend)/api/ai-chat/route'
 import config from '@/payload.config'
 import type { User } from '@/payload-types'
 import { randomBytes, randomUUID } from 'node:crypto'
+import { NextRequest } from 'next/server'
 import { getPayload, type Payload } from 'payload'
 import sharp from 'sharp'
-import { beforeAll, describe, expect, it } from 'vitest'
+import { beforeAll, describe, expect, it, vi } from 'vitest'
 
 let payload: Payload
 let owner: User
@@ -305,6 +307,86 @@ describe.sequential('permissions and product workflow', () => {
         user: owner,
       }),
     ).resolves.toBeDefined()
+  })
+
+  it('keeps customer service API settings owner-only', async () => {
+    await expect(
+      payload.findGlobal({
+        slug: 'customer-service',
+        overrideAccess: false,
+        user: editor,
+      }),
+    ).rejects.toThrow()
+
+    await expect(
+      payload.updateGlobal({
+        slug: 'customer-service',
+        data: {
+          apiKey: 'editor-must-not-write',
+          apiUrl: 'https://editor.example.test/chat',
+          authScheme: 'bearer',
+          enabled: true,
+        },
+        overrideAccess: false,
+        user: editor,
+      }),
+    ).rejects.toThrow()
+
+    const settings = await payload.updateGlobal({
+      slug: 'customer-service',
+      data: {
+        apiKey: 'owner-managed-key',
+        apiUrl: 'https://owner.example.test/chat',
+        authScheme: 'x-api-key',
+        enabled: true,
+      },
+      overrideAccess: false,
+      user: owner,
+    })
+    expect(settings.apiUrl).toBe('https://owner.example.test/chat')
+    expect(settings.authScheme).toBe('x-api-key')
+    expect(settings.apiKey).toBe('owner-managed-key')
+  })
+
+  it('uses the owner-managed endpoint and authentication scheme for chat requests', async () => {
+    await payload.updateGlobal({
+      slug: 'customer-service',
+      data: {
+        apiKey: 'route-test-key',
+        apiUrl: 'https://route-test.example.test/chat',
+        authScheme: 'x-api-key',
+        enabled: true,
+      },
+      overrideAccess: true,
+      user: owner,
+    })
+
+    const upstream = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+      new Response(JSON.stringify({ answer: 'Configured response' }), {
+        headers: { 'content-type': 'application/json' },
+        status: 200,
+      }),
+    )
+
+    try {
+      const response = await aiChatPOST(
+        new NextRequest('http://localhost/api/ai-chat', {
+          body: JSON.stringify({ locale: 'en', message: 'How can I request a quote?' }),
+          headers: { 'Content-Type': 'application/json' },
+          method: 'POST',
+        }),
+      )
+      expect(response.status).toBe(200)
+      expect(await response.json()).toEqual({ answer: 'Configured response' })
+      expect(upstream).toHaveBeenCalledWith(
+        'https://route-test.example.test/chat',
+        expect.objectContaining({
+          headers: expect.objectContaining({ 'X-API-Key': 'route-test-key' }),
+        }),
+      )
+    } finally {
+      upstream.mockRestore()
+    }
   })
 
   it('locks manually edited company translations', async () => {

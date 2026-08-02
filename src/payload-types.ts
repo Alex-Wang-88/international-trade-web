@@ -106,10 +106,12 @@ export interface Config {
     | ('en' | 'es' | 'ar' | 'de' | 'he' | 'ko' | 'pt' | 'zh-CN' | 'zh-TW')[];
   globals: {
     company: Company;
+    'customer-service': CustomerService;
     homepage: Homepage;
   };
   globalsSelect: {
     company: CompanySelect<false> | CompanySelect<true>;
+    'customer-service': CustomerServiceSelect<false> | CustomerServiceSelect<true>;
     homepage: HomepageSelect<false> | HomepageSelect<true>;
   };
   locale: 'en' | 'es' | 'ar' | 'de' | 'he' | 'ko' | 'pt' | 'zh-CN' | 'zh-TW';
@@ -1013,6 +1015,33 @@ export interface Company {
   createdAt?: string | null;
 }
 /**
+ * 在后台配置客服接口，保存后无需修改环境变量即可切换服务。仅所有者可查看和修改 API 密钥。
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "customer-service".
+ */
+export interface CustomerService {
+  id: number;
+  /**
+   * 关闭后即使配置了接口地址，前台也会使用人工联系方式提示。
+   */
+  enabled?: boolean | null;
+  /**
+   * 客服代理使用的 POST 接口地址。留空时使用 AI_CHAT_API_URL。
+   */
+  apiUrl?: string | null;
+  /**
+   * 密钥保存在受保护的后台配置中，仅在服务端使用。留空时使用 AI_CHAT_API_KEY。
+   */
+  apiKey?: string | null;
+  /**
+   * 选择向上游客服服务发送 API 密钥的方式。
+   */
+  authScheme: 'bearer' | 'raw' | 'x-api-key' | 'none';
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
  * 选择最多 8 个已发布商品，并拖动调整首页展示顺序。
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1064,6 +1093,19 @@ export interface CompanySelect<T extends boolean = true> {
         error?: T;
         id?: T;
       };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "customer-service_select".
+ */
+export interface CustomerServiceSelect<T extends boolean = true> {
+  enabled?: T;
+  apiUrl?: T;
+  apiKey?: T;
+  authScheme?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

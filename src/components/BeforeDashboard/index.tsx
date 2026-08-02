@@ -25,6 +25,7 @@ const entries = [
   { description: '选择最多 8 个已发布商品并拖动排序。', href: '/admin/globals/homepage', title: '首页商品排序' },
   { description: '撰写文章、预览草稿并正式发布。', href: '/admin/collections/posts', title: '博客管理' },
   { description: '统一维护品牌介绍、邮箱、电话和地址。', href: '/admin/globals/company', title: '公司资料与联系方式' },
+  { description: '配置客服 API 地址、密钥和认证方式。', href: '/admin/globals/customer-service', ownerOnly: true, title: '客服 API 配置' },
 ]
 
 export default function BeforeDashboard() {
@@ -47,7 +48,7 @@ export default function BeforeDashboard() {
       </Banner>
 
       <nav aria-label="后台主要功能" className="before-dashboard__entries">
-        {entries.map((entry) => (
+        {entries.filter((entry) => !entry.ownerOnly || data?.role === 'owner').map((entry) => (
           <Link href={entry.href} key={entry.href}>
             <strong>{entry.title}</strong>
             <span>{entry.description}</span>

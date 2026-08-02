@@ -36,5 +36,8 @@ test.describe('merchant admin', () => {
     await expect(page).toHaveURL(/\/admin\/collections\/users/)
     await page.goto('/admin/collections/audit-events')
     await expect(page).toHaveURL(/\/admin\/collections\/audit-events/)
+    await page.goto('/admin/globals/customer-service')
+    await expect(page).toHaveURL(/\/admin\/globals\/customer-service/)
+    await expect(page.locator('input[name="apiUrl"]')).toBeVisible()
   })
 })

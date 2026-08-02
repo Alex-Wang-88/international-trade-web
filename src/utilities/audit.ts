@@ -11,6 +11,7 @@ export type AuditAction =
   | 'content.deleted'
   | 'content.published'
   | 'content.unpublished'
+  | 'customer_service.updated'
   | 'translation.retry'
   | 'homepage.updated'
 
