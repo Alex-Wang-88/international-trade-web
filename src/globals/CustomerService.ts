@@ -27,6 +27,7 @@ export const CustomerService: GlobalConfig = {
   },
   admin: {
     group: tr('System settings', '系统设置', 'Configuración del sistema'),
+    hideAPIURL: true,
     description: tr(
       'Configure the optional customer-service agent without changing environment variables.',
       '在后台配置客服接口，保存后无需修改环境变量即可切换服务。仅所有者可查看和修改 API 密钥。',

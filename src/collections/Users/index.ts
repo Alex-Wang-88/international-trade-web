@@ -152,6 +152,7 @@ export const Users: CollectionConfig = {
     ),
     defaultColumns: ['name', 'email', 'role', 'updatedAt'],
     hidden: ({ user }) => user?.role !== 'owner',
+    hideAPIURL: true,
     useAsTitle: 'name',
   },
   auth: true,

@@ -53,6 +53,7 @@ export const Homepage: GlobalConfig = {
   },
   admin: {
     group: '网站内容',
+    hideAPIURL: true,
     description: '选择最多 8 个已发布商品，并拖动调整首页展示顺序。',
   },
   fields: [

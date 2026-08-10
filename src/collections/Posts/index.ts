@@ -92,6 +92,7 @@ export const Posts: CollectionConfig<'posts'> = {
       },
     },
     group: tr('Website content', '网站内容', 'Contenido del sitio'),
+    hideAPIURL: true,
     description: tr('Write product knowledge and company news. Save as a draft before publishing.', '撰写行业资讯、产品知识和公司动态。可以先保存草稿，确认后再发布。', 'Escriba información de productos y noticias. Puede guardar un borrador antes de publicar.'),
     defaultColumns: ['title', '_status', 'translationStatus', 'updatedAt'],
     livePreview: {

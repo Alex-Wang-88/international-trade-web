@@ -17,6 +17,8 @@ export const AuditEvents: CollectionConfig = {
   admin: {
     defaultColumns: ['createdAt', 'action', 'summary', 'actor'],
     group: '系统设置',
+    hidden: ({ user }) => user?.role !== 'owner',
+    hideAPIURL: true,
     useAsTitle: 'summary',
   },
   fields: [
@@ -59,4 +61,3 @@ export const AuditEvents: CollectionConfig = {
   ],
   timestamps: true,
 }
-

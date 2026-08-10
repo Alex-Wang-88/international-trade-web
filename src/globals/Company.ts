@@ -18,6 +18,7 @@ export const Company: GlobalConfig = {
   },
   admin: {
     group: tr('Website content', '网站内容', 'Contenido del sitio'),
+    hideAPIURL: true,
     description: tr('Update the homepage company profile and contact details.', '集中修改首页公司介绍、邮箱、电话和地址。保存后网站自动更新。', 'Actualice el perfil de la empresa y los datos de contacto.'),
   },
   fields: [
